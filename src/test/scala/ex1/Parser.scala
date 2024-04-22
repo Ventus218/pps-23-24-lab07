@@ -1,11 +1,9 @@
 package ex1
 
 import ex1.*
-import org.junit.Assert.*
-import org.junit.Test
 import Parsers.charParser
 
-class ParserTests:
+class ParserTests extends org.scalatest.funsuite.AnyFunSuite:
   def parser = new BasicParser(Set('a', 'b', 'c'))
   // Note NonEmpty being "stacked" on to a concrete class
   // Bottom-up decorations: NonEmptyParser -> NonEmpty -> BasicParser -> Parser
@@ -15,32 +13,29 @@ class ParserTests:
   def parserNTCNE = new BasicParser(Set('X', 'Y', 'Z')) with NotTwoConsecutive[Char] with NonEmpty[Char]
   def sparser: Parser[Char] = "abc".charParser()
 
-  @Test
-  def testBasicParser =
-    assertTrue(parser.parseAll("aabc".toList))
-    assertFalse(parser.parseAll("aabcdc".toList))
-    assertTrue(parser.parseAll("".toList))
+  import org.scalatest.matchers.should.Matchers.*
 
-  @Test
-  def testNotEmptyParser =
-    assertTrue(parserNE.parseAll("0101".toList))
-    assertFalse(parserNE.parseAll("0123".toList))
-    assertFalse(parserNE.parseAll(List()))
+  test("Test BasicParser"):
+    parser.parseAll("aabc".toList) shouldBe true
+    parser.parseAll("aabcdc".toList) shouldBe false
+    parser.parseAll("".toList) shouldBe true
 
-  @Test
-  def testNotTwoConsecutiveParser =
-    assertTrue(parserNTC.parseAll("XYZ".toList))
-    assertFalse(parserNTC.parseAll("XYYZ".toList))
-    assertTrue(parserNTC.parseAll("".toList))
+  test("Test NotEmptyParser"):
+    parserNE.parseAll("0101".toList) shouldBe true
+    parserNE.parseAll("0123".toList) shouldBe false
+    parserNE.parseAll(List()) shouldBe false
 
-  @Test
-  def testNotEmptyAndNotTwoConsecutiveParser =
-    assertTrue(parserNTCNE.parseAll("XYZ".toList))
-    assertFalse(parserNTCNE.parseAll("XYYZ".toList))
-    assertFalse(parserNTCNE.parseAll("".toList))
+  test("Test NotTwoConsecutiveParser"):
+    parserNTC.parseAll("XYZ".toList) shouldBe true
+    parserNTC.parseAll("XYYZ".toList) shouldBe false
+    parserNTC.parseAll("".toList) shouldBe true
 
-  @Test
-  def testStringParser =
-    assertTrue(sparser.parseAll("aabc".toList))
-    assertFalse(sparser.parseAll("aabcdc".toList))
-    assertTrue(sparser.parseAll("".toList))
+  test("Test NotEmptyAndNotTwoConsecutiveParser"):
+    parserNTCNE.parseAll("XYZ".toList) shouldBe true
+    parserNTCNE.parseAll("XYYZ".toList) shouldBe false
+    parserNTCNE.parseAll("".toList) shouldBe false
+
+  test("Test StringParser"):
+    sparser.parseAll("aabc".toList) shouldBe true
+    sparser.parseAll("aabcdc".toList) shouldBe false
+    sparser.parseAll("".toList) shouldBe true
