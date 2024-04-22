@@ -12,7 +12,8 @@ abstract class Parser[T]:
   def parseAll(seq: Seq[T]): Boolean = (seq forall parse) & end // note &, not &&
 
 object Parsers:
-  val todo = ??? // put the extensions here..
+  extension (s: String) def charParser(): Parser[Char] = BasicParser(s.toCharArray().toSet);
+
 class BasicParser(chars: Set[Char]) extends Parser[Char]:
   override def parse(t: Char): Boolean = chars.contains(t)
   override def end: Boolean = true
@@ -63,7 +64,8 @@ class NotTwoConsecutiveParser(chars: Set[Char]) extends BasicParser(chars) with 
   println(parserNTCNE.parseAll("XYYZ".toList)) // false
   println(parserNTCNE.parseAll("".toList)) // false
 
-  def sparser: Parser[Char] = ??? // "abc".charParser()
+  import Parsers.*
+  def sparser: Parser[Char] = "abc".charParser()
   println(sparser.parseAll("aabc".toList)) // true
   println(sparser.parseAll("aabcdc".toList)) // false
   println(sparser.parseAll("".toList)) // true
