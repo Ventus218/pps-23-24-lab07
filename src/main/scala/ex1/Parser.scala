@@ -27,10 +27,12 @@ trait NonEmpty[T] extends Parser[T]:
 class NonEmptyParser(chars: Set[Char]) extends BasicParser(chars) with NonEmpty[Char]
 
 trait NotTwoConsecutive[T] extends Parser[T]:
-  val todo = ???
-// ???
+  private var lastToken = Option.empty[T]
+  abstract override def parse(t: T): Boolean = lastToken match
+      case Some(`t`) => false
+      case _ => lastToken = Option(t); super.parse(t)
 
-class NotTwoConsecutiveParser(chars: Set[Char]) extends BasicParser(chars) // with ????
+class NotTwoConsecutiveParser(chars: Set[Char]) extends BasicParser(chars) with NotTwoConsecutive[Char]
 
 @main def checkParsers(): Unit =
   def parser = new BasicParser(Set('a', 'b', 'c'))
@@ -52,6 +54,11 @@ class NotTwoConsecutiveParser(chars: Set[Char]) extends BasicParser(chars) // wi
 
   // note we do not need a class name here, we use the structural type
   def parserNTCNE = new BasicParser(Set('X', 'Y', 'Z')) with NotTwoConsecutive[Char] with NonEmpty[Char]
+  // Linearisation:
+  // BasicParser -> Parser
+  // NonEmpty -> Parser
+  // NotTwoConsecutive -> Parser
+  // BasicParser with NotTwoConsecutive, NonEmpty -> NonEmpty -> NotTwoConsecutive -> BasicParser -> Parser
   println(parserNTCNE.parseAll("XYZ".toList)) // true
   println(parserNTCNE.parseAll("XYYZ".toList)) // false
   println(parserNTCNE.parseAll("".toList)) // false
