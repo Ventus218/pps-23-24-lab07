@@ -51,6 +51,14 @@ class RobotWithBattery(private val robot: Robot, private var _batteryCapacity: I
       batteryCapacity -= batteryActionCost
       robot.act()
 
+class RobotCanFail(private val robot: Robot, val successRate: Double) extends Robot:
+  require(successRate >= 0 && successRate <= 1)
+  export robot.{act => _, *}
+
+  override def act(): Unit =
+    if scala.util.Random.nextDouble() < successRate then
+      robot.act()
+
 @main def testRobot(): Unit =
   val robot = LoggingRobot(SimpleRobot((0, 0), Direction.North))
   robot.act() // robot at (0, 1) facing North
