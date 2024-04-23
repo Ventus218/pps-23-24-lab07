@@ -59,6 +59,14 @@ class RobotCanFail(private val robot: Robot, val successRate: Double) extends Ro
     if scala.util.Random.nextDouble() < successRate then
       robot.act()
 
+class RobotRepeated(private val robot: Robot, private val repetitions: Int) extends Robot:
+  require(repetitions > 0)
+  export robot.{act => _, *}
+  
+  override def act(): Unit =
+    for i <- 0 until repetitions do
+      robot.act()
+
 @main def testRobot(): Unit =
   val robot = LoggingRobot(SimpleRobot((0, 0), Direction.North))
   robot.act() // robot at (0, 1) facing North
