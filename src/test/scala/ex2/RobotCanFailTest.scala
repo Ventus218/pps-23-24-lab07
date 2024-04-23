@@ -3,13 +3,11 @@ package ex2
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.BeforeAndAfterEach
+import RobotTestUtils.*
 
 class RobotCanFailTest extends AnyFunSuite with Matchers with BeforeAndAfterEach:
     private val successRate = 0.5
     private var robot: RobotCanFail = _
-
-    extension (robot: Robot) def state: (Position, Direction) =
-        (robot.position, robot.direction)
 
     private def newDefaultRobot(successRate: Double) =
         new RobotCanFail(robot = new SimpleRobot((0, 0), Direction.North), successRate = successRate)

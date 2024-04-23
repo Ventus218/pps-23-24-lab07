@@ -3,6 +3,7 @@ package ex2
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.BeforeAndAfterEach
+import RobotTestUtils.*
 
 class RobotWithBatteryTest extends AnyFunSuite with Matchers with BeforeAndAfterEach:
     private val batteryCapacity = 100
@@ -22,6 +23,6 @@ class RobotWithBatteryTest extends AnyFunSuite with Matchers with BeforeAndAfter
     test("Act should do nothing if battery is empty"):
         robot.act()
         robot.act()
-        val state = (robot.position, robot.direction)
+        val state = robot.state
         robot.act()
-        (robot.position, robot.direction) shouldBe state
+        robot.state shouldBe state
