@@ -42,6 +42,15 @@ class LoggingRobot(val robot: Robot) extends Robot:
     robot.act()
     println(robot.toString)
 
+class RobotWithBattery(private val robot: Robot, private var _batteryCapacity: Int, private val batteryActionCost: Int) extends Robot:
+  private def batteryCapacity_=(value: Int) = _batteryCapacity = value
+  def batteryCapacity: Int = _batteryCapacity
+  export robot.{position, direction, turn}
+  override def act(): Unit =
+    if batteryCapacity > batteryActionCost then
+      batteryCapacity -= batteryActionCost
+      robot.act()
+
 @main def testRobot(): Unit =
   val robot = LoggingRobot(SimpleRobot((0, 0), Direction.North))
   robot.act() // robot at (0, 1) facing North
