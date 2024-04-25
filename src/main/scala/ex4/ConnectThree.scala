@@ -40,7 +40,12 @@ object ConnectThree extends App:
         case None => Some(0)
         case Some(y) => if y < bound then Some(y + 1) else None
 
-  def placeAnyDisk(board: Board, player: Player): Seq[Board] = ???
+  def placeAnyDisk(board: Board, player: Player): Seq[Board] =
+    for
+      x <- 0 to bound
+      y <- firstAvailableRow(board, x)
+    yield
+      board :+ Disk(x, y, player)
 
   def computeAnyGame(player: Player, moves: Int): LazyList[Game] = ???
 
