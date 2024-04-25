@@ -47,7 +47,19 @@ object ConnectThree extends App:
     yield
       board :+ Disk(x, y, player)
 
-  def computeAnyGame(player: Player, moves: Int): LazyList[Game] = ???
+  def computeAnyGame(player: Player, moves: Int): LazyList[Game] =
+    @annotation.tailrec
+    def _computeAnyGame(player: Player, moves: Int, games: LazyList[Game]): LazyList[Game] = moves match
+      case 0 => games
+      case _ =>
+        val gamesWithNextMove = for
+          game <- games
+          possibleMove <- placeAnyDisk(game.last, player)
+        yield game :+ possibleMove
+        _computeAnyGame(player.other, moves - 1, gamesWithNextMove)
+
+    val startingGames = LazyList.from(placeAnyDisk(Seq(), player).map(Seq(_)))
+    _computeAnyGame(player.other, moves - 1, startingGames)
 
   def printBoards(game: Seq[Board]): Unit =
     for
