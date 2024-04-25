@@ -2,11 +2,11 @@ package ex3
 
 object Solitaire extends App:
   case class Placement(x: Int, y: Int)
-  type Solution = Seq[Placement]
+  type Solution = Iterable[Placement]
 
   def render(solution: Solution, width: Int, height: Int): String =
     // val reversed = solution.toSeq.reverse
-    val reversed = solution
+    val reversed = solution.toSeq
     val rows =
       for y <- 0 until height
           row = for x <- 0 until width
@@ -30,25 +30,25 @@ object Solitaire extends App:
     res
 
   @annotation.tailrec
-  def placeMarks(width: Int, height: Int, currentSolutions: Seq[Solution] = Seq(), nToBePlaced: Int = width*height): Seq[Solution] = nToBePlaced match
+  def placeMarks(width: Int, height: Int, currentSolutions: Iterable[Solution] = LazyList(), nToBePlaced: Int = width*height): Iterable[Solution] = nToBePlaced match
     case 0 => currentSolutions
     case _ =>
       currentSolutions match
-      case Nil => placeMarks(width, height, Seq(Seq(Placement(width / 2, height / 2))), nToBePlaced - 1)
+      case Nil => placeMarks(width, height, LazyList(LazyList(Placement(width / 2, height / 2))), nToBePlaced - 1)
       case _ =>
         (for
           sol <- currentSolutions
           possiblePlacement <- placementsFromLastPlacement(width, height, sol.last)
           if sol.find(_ == possiblePlacement).isEmpty
         yield
-          sol :+ possiblePlacement)
+          sol ++ LazyList(possiblePlacement))
         match
-          case Nil => Seq()
+          case Nil => LazyList()
           case newSolutions => placeMarks(width, height, newSolutions, nToBePlaced -1)
 
-  val width = 5
+  val width = 7
   val height = 5
   val solutions = placeMarks(width, height)
-  solutions.foreach:
-    (s) => println(render(solution = s, width = width, height = height)); println()
+  // solutions.foreach:
+  //   (s) => println(render(solution = s, width = width, height = height)); println()
   println(s"${solutions.size} solutions found!")
