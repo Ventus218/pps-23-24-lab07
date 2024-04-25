@@ -29,28 +29,26 @@ object Solitaire extends App:
         res = res :+ Placement(x, y)
     res
 
-  def solve(width: Int, height: Int, currentSolutions: Seq[Solution] = Seq(), nToBePlaced: Int = width*height): Seq[Solution] =
-    if nToBePlaced == 0 then
-      currentSolutions
-    else
+  @annotation.tailrec
+  def placeMarks(width: Int, height: Int, currentSolutions: Seq[Solution] = Seq(), nToBePlaced: Int = width*height): Seq[Solution] = nToBePlaced match
+    case 0 => currentSolutions
+    case _ =>
       currentSolutions match
-      case Nil => solve(width, height, Seq(Seq(Placement(width / 2, height / 2))), nToBePlaced - 1)
+      case Nil => placeMarks(width, height, Seq(Seq(Placement(width / 2, height / 2))), nToBePlaced - 1)
       case _ =>
-        val newSolutions =
-          for
-            sol <- currentSolutions
-            possiblePlacement <- placementsFromLastPlacement(width, height, sol.last)
-            if sol.find(_ == possiblePlacement).isEmpty
-          yield
-            sol :+ possiblePlacement
-        if newSolutions.isEmpty then
-          Seq()
-        else
-          solve(width, height, newSolutions, nToBePlaced - 1)
+        (for
+          sol <- currentSolutions
+          possiblePlacement <- placementsFromLastPlacement(width, height, sol.last)
+          if sol.find(_ == possiblePlacement).isEmpty
+        yield
+          sol :+ possiblePlacement)
+        match
+          case Nil => Seq()
+          case newSolutions => placeMarks(width, height, newSolutions, nToBePlaced -1)
 
-  val width = 7
+  val width = 5
   val height = 5
-  val solutions = solve(width, height)
+  val solutions = placeMarks(width, height)
   solutions.foreach:
     (s) => println(render(solution = s, width = width, height = height)); println()
   println(s"${solutions.size} solutions found!")
