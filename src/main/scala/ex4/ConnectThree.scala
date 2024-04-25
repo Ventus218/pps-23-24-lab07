@@ -31,7 +31,14 @@ object ConnectThree extends App:
     case Nil => None
     case disk :: next => if disk.x == x && disk.y == y then Some(disk.player) else find(next, x, y)
 
-  def firstAvailableRow(board: Board, x: Int): Option[Int] = ???
+  def firstAvailableRow(board: Board, x: Int): Option[Int] =
+    board
+      .filter(_.x == x)
+      .sortBy(_.y)
+      .lastOption
+      .map(_.y) match
+        case None => Some(0)
+        case Some(y) => if y < bound then Some(y + 1) else None
 
   def placeAnyDisk(board: Board, player: Player): Seq[Board] = ???
 
@@ -53,6 +60,7 @@ object ConnectThree extends App:
   println(find(List(Disk(0, 0, X)), 0, 0)) // Some(X)
   println(find(List(Disk(0, 0, X), Disk(0, 1, O), Disk(0, 2, X)), 0, 1)) // Some(O)
   println(find(List(Disk(0, 0, X), Disk(0, 1, O), Disk(0, 2, X)), 1, 1)) // None
+  println()
 
   // Exercise 2: implement firstAvailableRow such that..
   println("EX 2: ")
@@ -60,7 +68,9 @@ object ConnectThree extends App:
   println(firstAvailableRow(List(Disk(0, 0, X)), 0)) // Some(1)
   println(firstAvailableRow(List(Disk(0, 0, X), Disk(0, 1, X)), 0)) // Some(2)
   println(firstAvailableRow(List(Disk(0, 0, X), Disk(0, 1, X), Disk(0, 2, X)), 0)) // Some(3)
+  println(firstAvailableRow(List(Disk(0, 0, X), Disk(0, 1, X), Disk(0, 2, X)), 1)) // Some(0)
   println(firstAvailableRow(List(Disk(0, 0, X), Disk(0, 1, X), Disk(0, 2, X), Disk(0, 3, X)), 0)) // None
+  println()
   // Exercise 2: implement placeAnyDisk such that..
   printBoards(placeAnyDisk(List(), X))
   // .... .... .... ....
