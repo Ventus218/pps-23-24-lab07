@@ -40,14 +40,17 @@ object ConnectThree extends App:
         case None => Some(0)
         case Some(y) => if y < bound then Some(y + 1) else None
 
-  def isWinningBoardForPlayer(board: Board, player: Player): Boolean =
+  def isWinningBoard(board: Board): Option[Player] =
     (for
       x <- 0 to bound
       y <- 0 to bound
       if !((x == 0 || x == bound) && (y == 0 || y == bound)) // corners can be ignored
-      if board.find(_ == Disk(x, y, player)).isDefined
-    yield (x, y)).exists(
-      (x, y) =>
+      disk <- board.find(disk => disk.x == x && disk.y == y)
+    yield (disk)).find(
+      (disk) =>
+        val x = disk.x
+        val y = disk.y
+        val player = disk.player
         // clearly a Hashed Map would be better
         // using functions allows to work lazylly
         val top = () => board.find(_ == Disk(x, y + 1, player))
@@ -63,7 +66,7 @@ object ConnectThree extends App:
         (left().isDefined && right().isDefined) ||
         (topLeftCorner().isDefined && bottomRightCorner().isDefined) ||
         (topRightCorner().isDefined && bottomLeftCorner().isDefined)
-    )
+    ).map(_.player)
 
   def placeAnyDisk(board: Board, player: Player): Seq[Board] =
     for
@@ -79,7 +82,7 @@ object ConnectThree extends App:
         for
           game <- _computeAnyGame(player.other, moves - 1, games)
           possibleMove <- placeAnyDisk(game.last, player)
-        yield if isWinningBoardForPlayer(game.last, player) || isWinningBoardForPlayer(game.last, player.other) then game else game :+ possibleMove
+        yield if isWinningBoard(game.last).isDefined then game else game :+ possibleMove
     
     val lastPlayer = if moves % 2 == 0 then player.other else player
     _computeAnyGame(lastPlayer, moves, LazyList())
@@ -124,13 +127,12 @@ object ConnectThree extends App:
   // ...O ..XO .X.O X..O
   println("EX 4: ")
 // Exercise 3 (ADVANCED!): implement computeAnyGame such that..
-  val anygame = computeAnyGame(O, 9)
+  val anygame = computeAnyGame(O, 8)
   anygame.foreach { g =>
     printBoards(g)
-    if isWinningBoardForPlayer(g.last, X) then
-      println("Won by X!")
-    if isWinningBoardForPlayer(g.last, O) then
-      println("Won by O!")
+    isWinningBoard(g.last) match
+      case Some(player) => println(s"Won by $player!")
+      case None => ()
     println()
   }
   println(s"\ntotal games computed: ${anygame.length}")
