@@ -40,6 +40,31 @@ object ConnectThree extends App:
         case None => Some(0)
         case Some(y) => if y < bound then Some(y + 1) else None
 
+  def isWinningBoardForPlayer(board: Board, player: Player): Boolean =
+    (for
+      x <- 0 to bound
+      y <- 0 to bound
+      if !((x == 0 || x == bound) && (y == 0 || y == bound)) // corners can be ignored
+      if board.find(_ == Disk(x, y, player)).isDefined
+    yield (x, y)).exists(
+      (x, y) =>
+        // clearly a Hashed Map would be better
+        // using functions allows to work lazylly
+        val top = () => board.find(_ == Disk(x, y + 1, player))
+        val bottom = () => board.find(_ == Disk(x, y - 1, player))
+        val left = () => board.find(_ == Disk(x - 1, y, player))
+        val right = () => board.find(_ == Disk(x + 1, y, player))
+        val topLeftCorner = () => board.find(_ == Disk(x - 1, y + 1, player))
+        val topRightCorner = () => board.find(_ == Disk(x + 1, y + 1, player))
+        val bottomLeftCorner = () => board.find(_ == Disk(x - 1, y - 1, player))
+        val bottomRightCorner = () => board.find(_ == Disk(x + 1, y - 1, player))
+
+        (top().isDefined && bottom().isDefined) ||
+        (left().isDefined && right().isDefined) ||
+        (topLeftCorner().isDefined && bottomRightCorner().isDefined) ||
+        (topRightCorner().isDefined && bottomLeftCorner().isDefined)
+    )
+
   def placeAnyDisk(board: Board, player: Player): Seq[Board] =
     for
       x <- 0 to bound
@@ -54,7 +79,7 @@ object ConnectThree extends App:
         for
           game <- _computeAnyGame(player.other, moves - 1, games)
           possibleMove <- placeAnyDisk(game.last, player)
-        yield game :+ possibleMove
+        yield if isWinningBoardForPlayer(game.last, player) || isWinningBoardForPlayer(game.last, player.other) then game else game :+ possibleMove
     
     val lastPlayer = if moves % 2 == 0 then player.other else player
     _computeAnyGame(lastPlayer, moves, LazyList())
@@ -99,10 +124,16 @@ object ConnectThree extends App:
   // ...O ..XO .X.O X..O
   println("EX 4: ")
 // Exercise 3 (ADVANCED!): implement computeAnyGame such that..
-  computeAnyGame(O, 4).foreach { g =>
+  val anygame = computeAnyGame(O, 9)
+  anygame.foreach { g =>
     printBoards(g)
+    if isWinningBoardForPlayer(g.last, X) then
+      println("Won by X!")
+    if isWinningBoardForPlayer(g.last, O) then
+      println("Won by O!")
     println()
   }
+  println(s"\ntotal games computed: ${anygame.length}")
 //  .... .... .... .... ...O
 //  .... .... .... ...X ...X
 //  .... .... ...O ...O ...O
