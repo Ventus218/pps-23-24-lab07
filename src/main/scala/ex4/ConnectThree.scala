@@ -1,6 +1,8 @@
 package ex4
 
 import java.util.OptionalInt
+import scala.util.Random
+import scala.annotation.targetName
 
 // Optional!
 object ConnectThree extends App:
@@ -140,4 +142,43 @@ object ConnectThree extends App:
   }
   println(s"\ntotal games computed: ${anygame.length}")
 
+  // Exercise 6 (Random AI)
+  // To test two games will be played and they should be different.
+  println("EX 6 (Random AI): ")
+
+  trait AI:
+    def makeMove(board: Board): Board
+
+    @targetName("makeMoveGame") // Found on the internet
+    def makeMove(game: Game): Game =
+      game appended makeMove(game.lastOption.getOrElse(Seq()))
+
+  class RandomAI(seed: Int, player: Player) extends AI:
+    var randomGenerator = Random(seed)
+    def makeMove(board: Board): Board =
+      require(board.lastOption.map(_.player) != Some(player))
+      val possibleMoves = placeAnyDisk(board, player)
+      require(possibleMoves.length > 0)
+      possibleMoves(randomGenerator.nextInt(possibleMoves.length))
+
+  // Tests ex 6
+  val xRandomAI1 = RandomAI(1234, Player.X)
+  val oRandomAI1 = RandomAI(5678, Player.O)
+  var game1: Game = Seq()
+  for i <- 0 until (bound*bound)/2 do
+    game1 = xRandomAI1.makeMove(game1);
+    game1 = oRandomAI1.makeMove(game1);
   
+  val xRandomAI2 = RandomAI(5678, Player.X)
+  val oRandomAI2 = RandomAI(1234, Player.O)
+  var game2: Game = Seq()
+  for i <- 0 until (bound*bound)/2 do
+    game2 = xRandomAI2.makeMove(game2);
+    game2 = oRandomAI2.makeMove(game2);
+  
+  printBoards(game1)
+  printBoards(game2)
+
+  println(s"RandomAI test ${if game1 != game2 then "passed" else "not passed"}")
+
+
