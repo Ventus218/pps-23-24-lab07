@@ -143,7 +143,6 @@ object ConnectThree extends App:
   println(s"\ntotal games computed: ${anygame.length}")
 
   // Exercise 6 (Random AI)
-  // To test two games will be played and they should be different.
   println("EX 6 (Random AI): ")
 
   trait AI:
@@ -161,7 +160,7 @@ object ConnectThree extends App:
       require(possibleMoves.length > 0)
       possibleMoves(randomGenerator.nextInt(possibleMoves.length))
 
-  // Tests ex 6 (Random AI)
+  // To test two games will be played and they should be different.
   val xRandomAI1 = RandomAI(1234, Player.X)
   val oRandomAI1 = RandomAI(5678, Player.O)
   var game1: Game = Seq()
