@@ -161,7 +161,7 @@ object ConnectThree extends App:
       require(possibleMoves.length > 0)
       possibleMoves(randomGenerator.nextInt(possibleMoves.length))
 
-  // Tests ex 6
+  // Tests ex 6 (Random AI)
   val xRandomAI1 = RandomAI(1234, Player.X)
   val oRandomAI1 = RandomAI(5678, Player.O)
   var game1: Game = Seq()
