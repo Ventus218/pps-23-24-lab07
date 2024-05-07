@@ -27,9 +27,8 @@ object ConnectThree extends App:
 
   import Player.*
 
-  def find(board: Board, x: Int, y: Int): Option[Player] = board match
-    case Nil => None
-    case disk :: next => if disk.x == x && disk.y == y then Some(disk.player) else find(next, x, y)
+  def find(board: Board, x: Int, y: Int): Option[Player] = 
+    board.find(d => d.x == x && d.y == y).map(_.player)
 
   def firstAvailableRow(board: Board, x: Int): Option[Int] =
     board
