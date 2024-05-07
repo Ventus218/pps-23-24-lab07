@@ -113,7 +113,9 @@ object ConnectThree extends App:
   println(firstAvailableRow(List(Disk(0, 0, X), Disk(0, 1, X), Disk(0, 2, X)), 1)) // Some(0)
   println(firstAvailableRow(List(Disk(0, 0, X), Disk(0, 1, X), Disk(0, 2, X), Disk(0, 3, X)), 0)) // None
   println()
-  // Exercise 2: implement placeAnyDisk such that..
+
+  // Exercise 3: implement placeAnyDisk such that..
+  println("EX 4: ")
   printBoards(placeAnyDisk(List(), X))
   // .... .... .... ....
   // .... .... .... ....
@@ -124,9 +126,11 @@ object ConnectThree extends App:
   // .... .... .... ....
   // ...X .... .... ....
   // ...O ..XO .X.O X..O
-  println("EX 4: ")
-// Exercise 3 (ADVANCED!): implement computeAnyGame such that..
-  val anygame = computeAnyGame(O, 8)
+  
+  // Exercise 4 (ADVANCED!): implement computeAnyGame such that..
+  // Exercise 5 (VERY ADVANCED!) -- modify the above one so as to stop each game when someone won!!
+  println("EX 4-5: ")
+  val anygame = computeAnyGame(O, 4)
   anygame.foreach { g =>
     printBoards(g)
     isWinningBoard(g.last) match
@@ -135,15 +139,5 @@ object ConnectThree extends App:
     println()
   }
   println(s"\ntotal games computed: ${anygame.length}")
-//  .... .... .... .... ...O
-//  .... .... .... ...X ...X
-//  .... .... ...O ...O ...O
-//  .... ...X ...X ...X ...X
-//
-//
-// .... .... .... .... O...
-// .... .... .... X... X...
-// .... .... O... O... O...
-// .... X... X... X... X...
 
-// Exercise 4 (VERY ADVANCED!) -- modify the above one so as to stop each game when someone won!!
+  
