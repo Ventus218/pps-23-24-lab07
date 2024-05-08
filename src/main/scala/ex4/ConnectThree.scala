@@ -27,6 +27,10 @@ object ConnectThree extends App:
   type Board = Seq[Disk]
   type Game = Seq[Board]
 
+  extension (game: Game)
+    def winner: Option[Player] = game.lastOption.flatMap(isWinningBoard(_))
+    def isWon: Boolean = game.winner.isDefined
+
   import Player.*
 
   def find(board: Board, x: Int, y: Int): Option[Player] = 
@@ -146,13 +150,14 @@ object ConnectThree extends App:
   println("EX 6 (Random AI): ")
 
   trait AI:
+    def player: Player
     def makeMove(board: Board): Board
 
     @targetName("makeMoveGame") // Found on the internet
     def makeMove(game: Game): Game =
       game appended makeMove(game.lastOption.getOrElse(Seq()))
 
-  class RandomAI(seed: Int, player: Player) extends AI:
+  class RandomAI(seed: Int, val player: Player) extends AI:
     var randomGenerator = Random(seed)
     def makeMove(board: Board): Board =
       require(board.lastOption.map(_.player) != Some(player))
@@ -181,3 +186,46 @@ object ConnectThree extends App:
   println(s"RandomAI test ${if game1 != game2 then "passed" else "not passed"}")
 
 
+  // Exercise 6 (Smart AI)
+  println("EX 6 (Smart AI): ")
+  class SmartAI(val player: Player) extends AI:
+    // The implemented strategy is the following:
+    // if there's a winning move -> make that move
+    // otherwise -> make the first available move
+    def makeMove(board: Board): Board =
+      require(board.lastOption.map(_.player) != Some(player))
+      val possibleMoves = placeAnyDisk(board, player)
+      require(possibleMoves.length > 0)
+      possibleMoves.find(isWinningBoard(_).isDefined).getOrElse(possibleMoves(0))
+
+  // Way of testing:
+  // A lot of game will be played where SmartAI faces RandomAI,
+  // the number of game won by the SmartAI should be higher than the ones by RandomAI
+  val gamesToPlay = 400
+  require((gamesToPlay % 2) == 0)
+  var games = Seq[Game]()
+  var wonBySmartAI = 0
+  var wonByRandomAI = 0
+
+  val randomAI = RandomAI(1234, Player.X)
+  val smartAI = SmartAI(Player.O)
+
+  var wins = Map(randomAI -> 0, smartAI -> 0)
+
+  for i <- 0 until gamesToPlay do
+    var game: Game = Seq()
+    var nMoves = 0
+    // To achieve fairness half of the games will be started by X and the other half by O
+    val (ai1, ai2) = if i >= (gamesToPlay / 2) then (randomAI, smartAI) else (smartAI, randomAI)
+    while nMoves < bound*bound && !game.isWon do
+      val ai = if (nMoves % 2) == 0 then ai1 else ai2
+      game = ai.makeMove(game);
+      if game.isWon then
+        wins = wins updated (ai, wins(ai) + 1)
+      nMoves += 1
+    games = games :+ game
+
+  println(s"SmartAI won ${wins(smartAI)} games")
+  println(s"RandomAI won ${wins(randomAI)} games")
+  println(s"SmartAI test ${if wins(smartAI) > wins(randomAI) then "passed" else "not passed"}")
+  
